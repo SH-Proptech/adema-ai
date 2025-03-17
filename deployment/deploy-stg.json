@@ -1,0 +1,22 @@
+{
+  "type": "deployment",
+  "name": "stg-adema-ai",
+  "domain": {
+    "host": "propmatch.co.uk",
+    "subdomain": "stg.ai",
+    "production_ssl": true
+  },
+  "image": {
+    "repo": "propacr.azurecr.io",
+    "name": "adema-ai",
+    "tag": "latest"
+  },
+  "container": {
+    "replicaCount": 2,
+    "port": 8080,
+    "path": "/v1"
+  },
+  "op": {
+    "item": "prop-stg-adema-ai"
+  }
+}

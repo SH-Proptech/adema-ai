@@ -1,0 +1,82 @@
+name: Build, Publish & Deploy
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Login to Azure Container Registry
+      - name: Docker Login
+        uses: azure/docker-login@v2
+        with:
+          login-server: propacr.azurecr.io
+          username: propacr
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      # Build and push Docker image
+      - name: Build and push Docker image
+        id: docker-build
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          file: ./docker/Dockerfile
+          tags: |
+            propacr.azurecr.io/adema-ai:latest
+            propacr.azurecr.io/adema-ai:${{ github.sha }}
+
+      # Read staging deployment JSON
+      - name: Staging deploy-stg.json
+        id: read-stg-json
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const file = fs.readFileSync('./deployment/deploy-stg.json', 'utf8');
+            const data = JSON.parse(file);
+            data.image.tag = "${{ github.sha }}"
+            return { manifest: JSON.stringify(data) }
+
+      # Trigger staging deployment
+      - name: Staging deployment
+        id: staging-deployment
+        uses: the-actions-org/workflow-dispatch@v4
+        with:
+          workflow: Deployment
+          repo: sh-proptech/deployment
+          token: ${{ secrets.GH_PAT_TOKEN }}
+          inputs: ${{ steps.read-stg-json.outputs.result }}
+          ref: main
+
+
+      # Read production deployment JSON
+      - name: Production deploy-prd.json
+        if: ${{ github.event_name == 'push' }}
+        id: read-prd-json
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const file = fs.readFileSync('./deployment/deploy-prd.json', 'utf8');
+            const data = JSON.parse(file);
+            data.image.tag = "${{ github.sha }}"
+            return { manifest: JSON.stringify(data) }
+
+      # Trigger production deployment
+      - name: Production deployment
+        if: ${{ github.event_name == 'push' }}
+        id: production-deployment
+        uses: the-actions-org/workflow-dispatch@v4
+        with:
+          workflow: Deployment
+          repo: sh-proptech/deployment
+          token: ${{ secrets.GH_PAT_TOKEN }}
+          inputs: ${{ steps.read-prd-json.outputs.result }}
+          ref: main

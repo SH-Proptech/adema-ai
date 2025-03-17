@@ -6,7 +6,7 @@ async function getPostcodeByCode(postcode: string): Promise<Promise<any>> {
   log(`Looking up postcode: ${postcode}`);
 
   const response = await fetch(`${url}/${postcode}`);
-  const data = await response.json();
+  const data: any = await response.json();
   if (data.status === 200) {
     return JSON.stringify(data.result);
   } else {
@@ -21,7 +21,7 @@ async function getPostCodeByLatLong(
   log(`Looking up postcode for lat: ${latitude}, long: ${longitude}`);
 
   const response = await fetch(`${url}?lon=${longitude}&lat=${latitude}`);
-  const data = await response.json();
+  const data: any = await response.json();
   if (data.status === 200) {
     return JSON.stringify(data.result);
   } else {

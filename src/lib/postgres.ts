@@ -1,22 +1,30 @@
 import pg from "pg";
-import * as dotenv from "dotenv";
 import { err, log } from "../util/log";
+import { config } from "@config/env";
 
-dotenv.config();
-
-const { Pool } = pg;
-
-const pool = new Pool({
+const options = {
   user: "prop",
-  host: process.env.PG_HOST,
+  host: config.POSTGRES_HOST,
   database: "prop-db",
-  password: process.env.PG_PASSWORD,
+  password: config.POSTGRES_PASSWORD,
   port: 5432,
   ssl: true,
   max: 20, // set pool max size to 20
   idleTimeoutMillis: 1000, // close idle clients after 1 second
   connectionTimeoutMillis: 1000, // return an error after 1 second if connection could not be established
   maxUses: 7500, // close (and replace) a connection after it has been used 7500 times (see below for discussion)
+};
+
+const { Pool } = pg;
+
+const pool = new Pool(options);
+
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error("Error acquiring client", err.stack);
+  } else {
+    console.log("Connected to PostgreSQL database");
+  }
 });
 
 async function queryDB(query: string, params: any[] = []): Promise<any[]> {

@@ -1,35 +1,14 @@
-# Logs
+.DS_Store
 logs
 *.log
 npm-debug.log*
-
-pdfs/
-
-# Dependency directories
 node_modules/
-
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Optional npm cache directory
 .npm
-
-# Optional eslint cache
 .eslintcache
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variable files
-.env
-
-# vuepress v2.x temp and cache directory
 .temp
 .cache
-
-# Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+
+dist/
+pdfs/
+.env

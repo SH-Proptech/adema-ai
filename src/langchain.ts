@@ -7,11 +7,11 @@ import {
 } from "@langchain/core/messages";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { systemMessage } from "./systemMessage";
-import { model } from "./ai/llm";
+import { model } from "@ai/llm";
 import { tools } from "./tools";
-import { redisCheckpointer } from "./lib/redis/redis";
-import { messageModifier, trimmer } from "./ai/trimmer";
-import { adema, user } from "./util/log";
+import { redisCheckpointer } from "@lib/redis/redis";
+import { messageModifier, trimmer } from "@ai/trimmer";
+import { adema, user } from "@util/log";
 
 // Create the agent with memory management and trimming
 const agent = createReactAgent({

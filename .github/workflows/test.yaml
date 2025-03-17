@@ -1,0 +1,32 @@
+name: Test
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+  workflow_dispatch: # This enables manual triggering of the workflow
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          file: ./docker/Dockerfile
+
+      - name: Generate Build Summary
+        if: always()
+        run: |
+          if [ "${{ steps.docker_build.outcome }}" == "success" ]; then
+            echo "### Build Status: Success" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### Build Status: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
