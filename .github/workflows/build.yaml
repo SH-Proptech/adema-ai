@@ -19,7 +19,7 @@ jobs:
         with:
           login-server: propacr.azurecr.io
           username: propacr
-          password: ${{ secrets.ACR_PASSWORD }}
+          password: ${{ secrets.ACR_TOKEN }}
 
       # Build and push Docker image
       - name: Build and push Docker image
