@@ -1,15 +1,13 @@
 import { RedisCheckpointSaver } from "./redisCheckpointer";
-import * as dotenv from "dotenv";
 import { Redis } from "ioredis";
-
-dotenv.config();
+import { config } from "@config/env";
 
 // Create the Redis connection instance using ioredis
 const redisConnection = new Redis({
-  host: "localhost",
-  password: process.env.REDIS_PASSWORD, // Use the password from environment variables
-  port: 6379,
-  db: 4,
+  host: config.REDIS_HOST, // Use the host from environment variables
+  password: config.REDIS_PASSWORD, // Use the password from environment variables
+  port: config.REDIS_PORT,
+  db: config.REDIS_DB,
 });
 
 // Instantiate the RedisCheckpointSaver with the Redis connection, serializer, and TTL

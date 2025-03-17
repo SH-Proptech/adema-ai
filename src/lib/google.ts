@@ -1,7 +1,5 @@
-import * as dotenv from "dotenv";
 import { log } from "../util/log";
-
-dotenv.config();
+import { config } from "@config/env";
 
 function createStaticMap(input: {
   latitude: number;
@@ -13,7 +11,7 @@ function createStaticMap(input: {
     `Creating static map for lat: ${input.latitude}, long: ${input.longitude}`
   );
 
-  let baseUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${input.latitude},${input.longitude}&zoom=${input.zoom}&size=600x400&maptype=roadmap&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+  let baseUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${input.latitude},${input.longitude}&zoom=${input.zoom}&size=600x400&maptype=roadmap&key=${config.GOOGLE_MAPS_API_KEY}`;
 
   if (input.geometry) {
     try {
@@ -39,11 +37,11 @@ function lookupAddress(input: { address: string }) {
   log(`Looking up address: ${input.address}`);
   const baseUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     input.address
-  )}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+  )}&key=${config.GOOGLE_MAPS_API_KEY}`;
 
   return fetch(baseUrl)
     .then((response) => response.json())
-    .then((data) => {
+    .then((data: any) => {
       if (data.status === "OK") {
         return data.results[0].geometry.location;
       } else {

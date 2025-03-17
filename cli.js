@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import axios from "axios";
-import readline from "readline";
-import chalk from "chalk";
+const axios = require("axios");
+const readline = require("readline");
+const chalk = require("chalk");
 
 const API_URL = "http://localhost:3000/chat";
 const threadId = "Brendon"; // Static thread ID for now
@@ -26,7 +26,6 @@ async function sendMessage(message) {
 
     const { text, tools = [] } = response.data.response;
 
-    console.log(tools);
     console.log("-----------------");
     console.log(tools[tools.length - 1]);
 

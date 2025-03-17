@@ -1,9 +1,10 @@
+import { config } from "@config/env";
 import { log } from "../util/log";
 
 async function propertyDataLookup(path: string): Promise<any> {
   try {
     const response = await fetch(
-      `https://api.propertydata.co.uk/${path}&key=${process.env.PROPERTY_DATA_API_KEY}`
+      `https://api.propertydata.co.uk/${path}&key=${config.PROPERTY_DATA_API_KEY}`
     );
     if (!response.ok) {
       throw new Error("Network response was not ok");
