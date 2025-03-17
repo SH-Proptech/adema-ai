@@ -7,6 +7,10 @@ dotenv.config();
 const app = express();
 app.use(express.json()); // For parsing JSON request body
 
+app.get("/ping", (_req: Request, res: Response): void => {
+  res.send("Pong!");
+});
+
 app.post("/chat", async (req: Request, res: Response): Promise<void> => {
   const { threadId, message } = req.body;
 
