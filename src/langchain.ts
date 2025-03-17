@@ -11,7 +11,7 @@ import { model } from "@ai/llm";
 import { tools } from "./tools";
 import { redisCheckpointer } from "@lib/redis/redis";
 import { messageModifier, trimmer } from "@ai/trimmer";
-import { adema, user } from "@util/log";
+import pino from "pino";
 
 // Create the agent with memory management and trimming
 const agent = createReactAgent({
@@ -21,8 +21,12 @@ const agent = createReactAgent({
   checkpointSaver: redisCheckpointer,
 });
 
-async function ask(threadId: string, input = "What can you do?") {
-  user(threadId, input);
+async function ask(
+  logger: pino.Logger,
+  threadId: string,
+  input = "What can you do?"
+) {
+  logger.info("user: ", threadId, input);
   try {
     const previousMessages = await redisCheckpointer.getTuple({
       configurable: { thread_id: threadId },
@@ -41,7 +45,7 @@ async function ask(threadId: string, input = "What can you do?") {
       {
         messages: trimmedMessages,
       },
-      { configurable: { thread_id: threadId }, recursionLimit: 10 }
+      { configurable: { thread_id: threadId, logger }, recursionLimit: 10 }
     );
 
     // Extract text response
@@ -55,7 +59,7 @@ async function ask(threadId: string, input = "What can you do?") {
       .map((msg) => msg.content);
 
     const response = { text: textResponse, tools: toolOutputs };
-    adema(threadId, response);
+    logger.info("adema:", threadId, response);
     return response;
   } catch (error: any) {
     console.error("Error:", error.message);

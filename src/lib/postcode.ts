@@ -1,9 +1,12 @@
-import { log } from "../util/log";
+import pino from "pino";
 
 const url = "https://api.postcodes.io/postcodes";
 
-async function getPostcodeByCode(postcode: string): Promise<Promise<any>> {
-  log(`Looking up postcode: ${postcode}`);
+async function getPostcodeByCode(
+  logger: pino.Logger,
+  postcode: string
+): Promise<Promise<any>> {
+  logger.info(`Looking up postcode: ${postcode}`);
 
   const response = await fetch(`${url}/${postcode}`);
   const data: any = await response.json();
@@ -15,10 +18,11 @@ async function getPostcodeByCode(postcode: string): Promise<Promise<any>> {
 }
 
 async function getPostCodeByLatLong(
+  logger: pino.Logger,
   latitude: number,
   longitude: number
 ): Promise<Promise<any>> {
-  log(`Looking up postcode for lat: ${latitude}, long: ${longitude}`);
+  logger.info(`Looking up postcode for lat: ${latitude}, long: ${longitude}`);
 
   const response = await fetch(`${url}?lon=${longitude}&lat=${latitude}`);
   const data: any = await response.json();

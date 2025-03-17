@@ -1,25 +1,25 @@
 import { config } from "@config/env";
-import { log } from "../util/log";
+import pino from "pino";
 
 async function propertyDataLookup(path: string): Promise<any> {
-  try {
-    const response = await fetch(
-      `https://api.propertydata.co.uk/${path}&key=${config.PROPERTY_DATA_API_KEY}`
-    );
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("There was a problem with the fetch operation:", error);
+  const response = await fetch(
+    `https://api.propertydata.co.uk/${path}&key=${config.PROPERTY_DATA_API_KEY}`
+  );
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
   }
+  const data = await response.json();
+  return data;
 }
 
 // This endpoint returns freehold land title numbers, along with the title class and headline information
 // about the associated polygons including approx centres and number of leaseholds.
-function lookupFreeholdInformation(lat: number, long: number) {
-  log(`Looking up freehold information for lat: ${lat}, long: ${long}`);
+function lookupFreeholdInformation(
+  logger: pino.Logger,
+  lat: number,
+  long: number
+) {
+  logger.info(`Looking up freehold information for lat: ${lat}, long: ${long}`);
 
   return propertyDataLookup(`freeholds?location=${lat},${long}`);
 }
@@ -33,14 +33,18 @@ function lookupFreeholdInformation(lat: number, long: number) {
 //     List of polygons including polygon size [2], approximate polygon centre [3] and polygon co-ordinates [4]
 //     Attached leaseholds
 //     Attached UPRNs
-function lookupTitleInformation(title: string) {
-  log(`Looking up title information for title: ${title}`);
+function lookupTitleInformation(logger: pino.Logger, title: string) {
+  logger.info(`Looking up title information for title: ${title}`);
   return propertyDataLookup(`title?title=${title}`);
 }
 
 // This endpoint returns the closest care home planning applications.
-function lookupCareHomePlanningInformation(lat: number, long: number) {
-  log(
+function lookupCareHomePlanningInformation(
+  logger: pino.Logger,
+  lat: number,
+  long: number
+) {
+  logger.info(
     `Looking up care home planning information for lat: ${lat}, long: ${long}`
   );
   return propertyDataLookup(
@@ -89,8 +93,15 @@ function lookupCareHomePlanningInformation(lat: number, long: number) {
 // one-to-two-bed-conversions
 // two-to-three-bed-conversions
 
-function lookupSourcedProperties(lat: number, long: number, list: string) {
-  log(`Creating static map for lat: ${lat}, long: ${long}, list: ${list}`);
+function lookupSourcedProperties(
+  logger: pino.Logger,
+  lat: number,
+  long: number,
+  list: string
+) {
+  logger.info(
+    `Creating static map for lat: ${lat}, long: ${long}, list: ${list}`
+  );
   return propertyDataLookup(
     `sourced-properties?list=${list}&location=${lat},${long}`
   );

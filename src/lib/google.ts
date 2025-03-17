@@ -1,13 +1,14 @@
-import { log } from "../util/log";
 import { config } from "@config/env";
+import pino from "pino";
 
 function createStaticMap(input: {
+  logger: pino.Logger;
   latitude: number;
   longitude: number;
   zoom: number;
   geometry?: string;
 }) {
-  log(
+  input.logger.info(
     `Creating static map for lat: ${input.latitude}, long: ${input.longitude}`
   );
 
@@ -33,8 +34,8 @@ function createStaticMap(input: {
   return { type: "map", content: baseUrl };
 }
 
-function lookupAddress(input: { address: string }) {
-  log(`Looking up address: ${input.address}`);
+function lookupAddress(input: { logger: pino.Logger; address: string }) {
+  input.logger.info(`Looking up address: ${input.address}`);
   const baseUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     input.address
   )}&key=${config.GOOGLE_MAPS_API_KEY}`;

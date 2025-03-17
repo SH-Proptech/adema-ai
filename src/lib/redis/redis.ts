@@ -10,6 +10,10 @@ const redisConnection = new Redis({
   db: config.REDIS_DB,
 });
 
+redisConnection.on("connect", () => {
+  console.log("Connected to Redis");
+});
+
 // Instantiate the RedisCheckpointSaver with the Redis connection, serializer, and TTL
 const redisCheckpointer = new RedisCheckpointSaver(
   { connection: redisConnection } // Connection parameter

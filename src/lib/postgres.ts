@@ -1,6 +1,6 @@
 import pg from "pg";
-import { err, log } from "../util/log";
 import { config } from "@config/env";
+import pino from "pino";
 
 const options = {
   user: "prop",
@@ -27,13 +27,17 @@ pool.connect((err, client, release) => {
   }
 });
 
-async function queryDB(query: string, params: any[] = []): Promise<any[]> {
-  log(`Querying database: ${query}`);
+async function queryDB(
+  logger: pino.Logger,
+  query: string,
+  params: any[] = []
+): Promise<any[]> {
+  logger.info(`Querying database: ${query}`);
   try {
     const { rows } = await pool.query(query, params);
     return rows;
   } catch (error) {
-    err(`Querying database error: ${error}`);
+    logger.error(`Querying database error: ${error}`);
     throw error;
   }
 }
