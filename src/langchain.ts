@@ -11,7 +11,13 @@ import { model } from "@ai/llm";
 import { tools } from "./tools";
 import { redisCheckpointer } from "@lib/redis/redis";
 import { messageModifier, trimmer } from "@ai/trimmer";
-import { adema, user } from "@util/log";
+import pino from "pino";
+import { RunnableConfig } from "@langchain/core/dist/runnables";
+
+export type AppRunnableConfig = RunnableConfig<{
+  threadId: string;
+  logger: pino.Logger;
+}>;
 
 // Create the agent with memory management and trimming
 const agent = createReactAgent({
@@ -21,12 +27,20 @@ const agent = createReactAgent({
   checkpointSaver: redisCheckpointer,
 });
 
-async function ask(threadId: string, input = "What can you do?") {
-  user(threadId, input);
+async function ask(
+  logger: pino.Logger,
+  threadId: string,
+  input = "What can you do?"
+) {
+  logger.info("user: ", threadId, input);
+
+  const config: AppRunnableConfig = {
+    configurable: { threadId, logger },
+    recursionLimit: 15,
+  };
+
   try {
-    const previousMessages = await redisCheckpointer.getTuple({
-      configurable: { thread_id: threadId },
-    });
+    const previousMessages = await redisCheckpointer.getTuple(config);
 
     // Define the messages for the conversation
     const messages = previousMessages
@@ -41,7 +55,7 @@ async function ask(threadId: string, input = "What can you do?") {
       {
         messages: trimmedMessages,
       },
-      { configurable: { thread_id: threadId }, recursionLimit: 10 }
+      config
     );
 
     // Extract text response
@@ -55,7 +69,7 @@ async function ask(threadId: string, input = "What can you do?") {
       .map((msg) => msg.content);
 
     const response = { text: textResponse, tools: toolOutputs };
-    adema(threadId, response);
+    logger.info("adema:", threadId, response);
     return response;
   } catch (error: any) {
     console.error("Error:", error.message);

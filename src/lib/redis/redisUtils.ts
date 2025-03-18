@@ -38,7 +38,7 @@ export function makeRedisCheckpointWritesKey(
 export function parseRedisCheckpointWritesKey(
   redisKey: string
 ): Record<string, string> {
-  const [namespace, thread_id, checkpoint_ns, checkpoint_id, task_id, idx] =
+  const [namespace, threadId, checkpoint_ns, checkpoint_id, task_id, idx] =
     redisKey.split(REDIS_KEY_SEPARATOR);
 
   if (namespace !== "writes") {
@@ -46,7 +46,7 @@ export function parseRedisCheckpointWritesKey(
   }
 
   return {
-    thread_id,
+    threadId,
     checkpoint_ns,
     checkpoint_id,
     task_id,
@@ -125,11 +125,11 @@ export async function parseRedisCheckpointData(
 ): Promise<CheckpointTuple> {
   const parsedKey = parseRedisCheckpointKey(key);
 
-  const { thread_id, checkpoint_ns = "", checkpoint_id } = parsedKey;
+  const { threadId, checkpoint_ns = "", checkpoint_id } = parsedKey;
 
   const config = {
     configurable: {
-      thread_id,
+      threadId,
 
       checkpoint_ns,
 
@@ -152,7 +152,7 @@ export async function parseRedisCheckpointData(
   const parentConfig = parentCheckpointId
     ? {
         configurable: {
-          thread_id,
+          threadId,
           checkpoint_ns,
           checkpoint_id: parentCheckpointId,
         },
@@ -165,7 +165,7 @@ export async function parseRedisCheckpointData(
 export function parseRedisCheckpointKey(
   redisKey: string
 ): Record<string, string> {
-  const [namespace, thread_id, checkpoint_ns, checkpoint_id] =
+  const [namespace, threadId, checkpoint_ns, checkpoint_id] =
     redisKey.split(REDIS_KEY_SEPARATOR);
 
   if (namespace !== "checkpoint") {
@@ -173,7 +173,7 @@ export function parseRedisCheckpointKey(
   }
 
   return {
-    thread_id,
+    threadId,
     checkpoint_ns,
     checkpoint_id,
   };

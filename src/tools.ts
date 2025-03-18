@@ -1,4 +1,4 @@
-import { tool } from "@langchain/core/tools";
+import { tool, ToolRunnableConfig } from "@langchain/core/tools";
 import { queryDB } from "./lib/postgres";
 import { z } from "zod";
 import { getPostcodeByCode, getPostCodeByLatLong } from "./lib/postcode";
@@ -10,17 +10,20 @@ import {
   lookupSourcedProperties,
   lookupTitleInformation,
 } from "./lib/propertyData";
+import pino from "pino";
+import { RunnableConfig } from "@langchain/core/runnables";
 
 // Define the types for the tool input
 interface DBQueryInput {
   query: string;
 }
 
-// Define a tool for executing SQL queries
+// Define your tool function using AppConfig as the configuration
 const dbTool = tool(
-  async (input: DBQueryInput) => {
+  async (input: DBQueryInput, { configurable }: RunnableConfig) => {
+    const logger = configurable?.logger ?? pino(); // Ensure logger is defined
     try {
-      const result = await queryDB(input.query);
+      const result = await queryDB(logger, input.query);
       return JSON.stringify(result, null, 2);
     } catch (error: any) {
       return `Error executing query: ${error.message}`;
@@ -43,9 +46,10 @@ interface PostcodeLookupInput {
 
 // Define a tool for looking up UK postcodes
 const postcodeLookupTool = tool(
-  async (input: PostcodeLookupInput) => {
+  async (input: PostcodeLookupInput, { configurable }: RunnableConfig) => {
     try {
-      return getPostcodeByCode(input.postcode);
+      const logger = configurable?.logger || pino();
+      return getPostcodeByCode(logger, input.postcode);
     } catch (error: any) {
       return `Error looking up postcode: ${error.message}`;
     }
@@ -68,9 +72,10 @@ interface LatLongLookupInput {
 
 // Define a tool for looking up UK postcodes via latitude and longitude
 const latLongLookupTool = tool(
-  async (input: LatLongLookupInput) => {
+  async (input: LatLongLookupInput, { configurable }: RunnableConfig) => {
     try {
-      return getPostCodeByLatLong(input.latitude, input.longitude);
+      const logger = configurable?.logger || pino();
+      return getPostCodeByLatLong(logger, input.latitude, input.longitude);
     } catch (error: any) {
       return `Error looking up postcode: ${error.message}`;
     }
@@ -88,12 +93,17 @@ const latLongLookupTool = tool(
 
 // Define the tool expecting WKT as the geometry format
 const mapTool = tool(
-  async (input: {
-    latitude: number;
-    longitude: number;
-    zoom: number;
-    geometry?: string;
-  }) => {
+  async (
+    input: {
+      latitude: number;
+      longitude: number;
+      zoom: number;
+      geometry?: string;
+    },
+    { configurable }: RunnableConfig
+  ) => {
+    const logger = configurable?.logger || pino();
+
     let geometryData;
 
     if (input.geometry) {
@@ -110,6 +120,7 @@ const mapTool = tool(
     }
 
     return createStaticMap({
+      logger,
       latitude: input.latitude,
       longitude: input.longitude,
       zoom: input.zoom,
@@ -141,8 +152,10 @@ function convertWKTtoGeoJSON(wkt: string) {
 }
 
 const address = tool(
-  async (input: { address: string }) => {
-    return lookupAddress(input);
+  async (input: { address: string }, { configurable }: RunnableConfig) => {
+    const logger = configurable?.logger || pino();
+
+    return lookupAddress({ logger, address: input.address });
   },
   {
     name: "AddressLookup",
@@ -162,9 +175,10 @@ interface FreeholdLookupInput {
 
 // Define a tool for looking up freehold information
 const freeholdLookupTool = tool(
-  async (input: FreeholdLookupInput) => {
+  async (input: FreeholdLookupInput, { configurable }: RunnableConfig) => {
     try {
-      return lookupFreeholdInformation(input.latitude, input.longitude);
+      const logger = configurable?.logger || pino();
+      return lookupFreeholdInformation(logger, input.latitude, input.longitude);
     } catch (error: any) {
       return `Error looking up freehold information: ${error.message}`;
     }
@@ -187,9 +201,10 @@ interface TitleLookupInput {
 
 // Define a tool for looking up title information
 const titleLookupTool = tool(
-  async (input: TitleLookupInput) => {
+  async (input: TitleLookupInput, { configurable }: RunnableConfig) => {
     try {
-      return lookupTitleInformation(input.title);
+      const logger = configurable?.logger || pino();
+      return lookupTitleInformation(logger, input.title);
     } catch (error: any) {
       return `Error looking up title information: ${error.message}`;
     }
@@ -212,9 +227,17 @@ interface CareHomePlanningLookupInput {
 
 // Define a tool for looking up care home planning information
 const careHomePlanningLookupTool = tool(
-  async (input: CareHomePlanningLookupInput) => {
+  async (
+    input: CareHomePlanningLookupInput,
+    { configurable }: RunnableConfig
+  ) => {
     try {
-      return lookupCareHomePlanningInformation(input.latitude, input.longitude);
+      const logger = configurable?.logger || pino();
+      return lookupCareHomePlanningInformation(
+        logger,
+        input.latitude,
+        input.longitude
+      );
     } catch (error: any) {
       return `Error looking up care home planning information: ${error.message}`;
     }
@@ -239,9 +262,14 @@ interface SourcedPropertiesLookupInput {
 
 // Define a tool for looking up sourced properties
 const sourcedPropertiesLookupTool = tool(
-  async (input: SourcedPropertiesLookupInput) => {
+  async (
+    input: SourcedPropertiesLookupInput,
+    { configurable }: RunnableConfig
+  ) => {
     try {
+      const logger = configurable?.logger || pino();
       return lookupSourcedProperties(
+        logger,
         input.latitude,
         input.longitude,
         input.list

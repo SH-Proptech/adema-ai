@@ -1,17 +1,21 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { ask } from "./langchain";
+import { loggingMiddleware } from "@middleware/logging";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json()); // For parsing JSON request body
+app.use(loggingMiddleware()); // logging middleware
 
-app.get("/ping", (_req: Request, res: Response): void => {
+app.get("/ping", (req: Request, res: Response): void => {
+  req.log.debug("/ping");
   res.send("Pong!");
 });
 
 app.post("/chat", async (req: Request, res: Response): Promise<void> => {
+  req.log.debug("/chat");
   const { threadId, message } = req.body;
 
   if (!threadId || !message) {
@@ -20,7 +24,7 @@ app.post("/chat", async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    const response = await ask(threadId, message);
+    const response = await ask(req.log, threadId, message);
     res.json({ response });
   } catch (error) {
     console.error("Error during conversation:", error);

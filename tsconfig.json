@@ -21,6 +21,7 @@
       "@ai/*": ["./src/ai/*"],
       "@config/*": ["./src/config/*"],
       "@lib/*": ["./src/lib/*"],
+      "@middleware/*": ["./src/middleware/*"],
       "@util/*": ["./src/util/*"]
     }
   },

@@ -6,11 +6,12 @@
       "decorators": true,
       "dynamicImport": true
     },
-    "target": "es2020",
+    "target": "esnext",
     "paths": {
       "@ai/*": ["./src/ai/*"],
       "@config/*": ["./src/config/*"],
       "@lib/*": ["./src/lib/*"],
+      "@middleware/*": ["./src/middleware/*"],
       "@util/*": ["./src/util/*"]
     },
     "baseUrl": "."
