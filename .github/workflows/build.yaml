@@ -14,12 +14,19 @@ jobs:
         uses: actions/checkout@v4
 
       # Login to Azure Container Registry
-      - name: Docker Login
+      - name: ACR Login
         uses: azure/docker-login@v2
         with:
           login-server: propacr.azurecr.io
           username: propacr
           password: ${{ secrets.ACR_TOKEN }}
+
+      # Login to Docker Hub
+      - name: Docker Login
+        uses: azure/docker-login@v2
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
       # Build and push Docker image
       - name: Build and push Docker image
@@ -31,8 +38,6 @@ jobs:
           tags: |
             propacr.azurecr.io/adema-ai:latest
             propacr.azurecr.io/adema-ai:${{ github.sha }}
-          username: ${{ vars.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
 
       # Read staging deployment JSON
       - name: Staging deploy-stg.json
