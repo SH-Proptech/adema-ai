@@ -14,7 +14,7 @@
   "container": {
     "replicaCount": 2,
     "port": 8080,
-    "path": "/ping"
+    "path": "/"
   },
   "op": {
     "item": "prop-adema-ai"
