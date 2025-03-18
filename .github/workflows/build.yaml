@@ -73,7 +73,7 @@ jobs:
         id: staging-api-tests
         run: ./taskfile api_test
         env:
-          URL: https://stg.ai.propmatch.co.uk/
+          URL: https://stg.ai.propmatch.co.uk
 
       # Read production deployment JSON
       - name: Production deploy-prd.json
