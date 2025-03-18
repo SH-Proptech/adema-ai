@@ -57,6 +57,17 @@ jobs:
           inputs: ${{ steps.read-stg-json.outputs.result }}
           ref: main
 
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'  # or the version you are using
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          npm install --frozen-lockfile
+
       # Test staging
       - name: Staging API tests
         id: staging-api-tests
