@@ -2,6 +2,8 @@ import request from "supertest";
 
 const url = process.env.URL || "http://localhost:8181";
 
+console.log({ url });
+
 describe("GET /thread/:threadId", () => {
   it("should not return thread data", async () => {
     const response = await request(url)
