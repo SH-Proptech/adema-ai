@@ -8,11 +8,9 @@ import { authMiddleware } from "@middleware/auth";
 const app = express();
 app.use(express.json());
 app.use(loggingMiddleware());
-
 app.use(corsMiddleware());
-app.use(authMiddleware());
-
 app.get("/ping", ping);
+app.use(authMiddleware());
 app.get("/thread/:threadId", getThreadHistory);
 app.post("/thread/:threadId", addMessageToThread);
 
