@@ -71,7 +71,7 @@ jobs:
       # Test staging
       - name: Staging API tests
         id: staging-api-tests
-        run: ./taskfile api_test
+        run: ./taskfile test_stg
         env:
           URL: https://stg.ai.propmatch.co.uk
           CLIENT_ID: ${{ secrets.STG_TEST_CLIENT_ID }}
@@ -105,7 +105,7 @@ jobs:
       # Test production
       - name: Production API tests
         id: production-api-tests
-        run: ./taskfile api_test
+        run: ./taskfile test_prd
         env:
           URL: https://ai.propmatch.co.uk
           CLIENT_ID: ${{ secrets.PRD_TEST_CLIENT_ID }}
