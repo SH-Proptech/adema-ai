@@ -13,15 +13,15 @@ function test {
     CLIENT_ID=FsEQJSN0UMYn8ZAysphuM4WYteKKogHg
     CLIENT_SECRET=$(op item get "api-test-client-dev" --field credential --reveal)
     URL=http://localhost:8181
-    CLIENT_ID=${CLIENT_ID} CLIENT_SECRET=${CLIENT_SECRET} URL=${URL} jest
+    CLIENT_ID=${CLIENT_ID} CLIENT_SECRET=${CLIENT_SECRET} URL=${URL} npx jest
 }
 
 function test_stg {
-    URL=https://stg.ai.propmatch.co.uk jest
+    URL=https://stg.ai.propmatch.co.uk npx jest
 }
 
 function test_prd {
-    URL=https://ai.propmatch.co.uk jest
+    URL=https://ai.propmatch.co.uk npx jest
 }
 
 # ---------- Do NOT edit below --------------
