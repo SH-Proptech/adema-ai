@@ -48,13 +48,13 @@ export class RedisCheckpointSaver extends BaseCheckpointSaver {
     const checkpoint_id = checkpoint.id;
 
     const {
-      thread_id,
+      threadId,
       checkpoint_ns = "",
       checkpoint_id: parent_checkpoint_id,
     } = config.configurable ?? {};
 
     const key = makeRedisCheckpointKey(
-      thread_id ?? "",
+      threadId ?? "",
       checkpoint_ns,
       checkpoint_id
     );
@@ -84,7 +84,7 @@ export class RedisCheckpointSaver extends BaseCheckpointSaver {
 
     return {
       configurable: {
-        thread_id,
+        threadId,
         checkpoint_ns,
         checkpoint_id,
       },
@@ -97,16 +97,16 @@ export class RedisCheckpointSaver extends BaseCheckpointSaver {
     writes: PendingWrite[],
     task_id: string
   ): Promise<void> {
-    const { thread_id, checkpoint_ns, checkpoint_id } =
+    const { threadId, checkpoint_ns, checkpoint_id } =
       config.configurable ?? {};
 
     if (
-      thread_id === undefined ||
+      threadId === undefined ||
       checkpoint_ns === undefined ||
       checkpoint_id === undefined
     ) {
       throw new Error(
-        `The provided config must contain a configurable field with "thread_id", "checkpoint_ns" and "checkpoint_id" fields.`
+        `The provided config must contain a configurable field with "threadId", "checkpoint_ns" and "checkpoint_id" fields.`
       );
     }
 
@@ -114,7 +114,7 @@ export class RedisCheckpointSaver extends BaseCheckpointSaver {
 
     for (const [idx, write] of dumpedWrites.entries()) {
       const key = makeRedisCheckpointWritesKey(
-        thread_id,
+        threadId,
         checkpoint_ns,
         checkpoint_id,
         task_id,
@@ -132,15 +132,15 @@ export class RedisCheckpointSaver extends BaseCheckpointSaver {
 
   // Get a checkpoint tuple from Redis
   async getTuple(config: RunnableConfig): Promise<CheckpointTuple | undefined> {
-    const { thread_id, checkpoint_ns = "" } = config.configurable ?? {};
+    const { threadId, checkpoint_ns = "" } = config.configurable ?? {};
     let { checkpoint_id } = config.configurable ?? {};
 
-    if (thread_id === undefined) {
-      throw new Error("thread_id is required in config.configurable");
+    if (threadId === undefined) {
+      throw new Error("threadId is required in config.configurable");
     }
 
     const checkpointKey = await this._getCheckpointKey(
-      thread_id,
+      threadId,
       checkpoint_ns,
       checkpoint_id
     );
@@ -153,7 +153,7 @@ export class RedisCheckpointSaver extends BaseCheckpointSaver {
       checkpoint_id ?? parseRedisCheckpointKey(checkpointKey).checkpoint_id;
 
     const writesKey = makeRedisCheckpointWritesKey(
-      thread_id,
+      threadId,
       checkpoint_ns,
       checkpoint_id,
       "*",
@@ -192,9 +192,9 @@ export class RedisCheckpointSaver extends BaseCheckpointSaver {
     options?: CheckpointListOptions
   ): AsyncGenerator<CheckpointTuple> {
     const { limit, before } = options ?? {};
-    const { thread_id, checkpoint_ns } = config.configurable ?? {};
+    const { threadId, checkpoint_ns } = config.configurable ?? {};
 
-    const pattern = makeRedisCheckpointKey(thread_id, checkpoint_ns, "*");
+    const pattern = makeRedisCheckpointKey(threadId, checkpoint_ns, "*");
     let keys = await this.connection.keys(pattern);
 
     keys = filterKeys(keys, before, limit);
@@ -209,16 +209,16 @@ export class RedisCheckpointSaver extends BaseCheckpointSaver {
 
   // Private method to get the latest checkpoint key
   private async _getCheckpointKey(
-    thread_id: string,
+    threadId: string,
     checkpoint_ns: string,
     checkpoint_id: string | undefined
   ): Promise<string | null> {
     if (checkpoint_id) {
-      return makeRedisCheckpointKey(thread_id, checkpoint_ns, checkpoint_id);
+      return makeRedisCheckpointKey(threadId, checkpoint_ns, checkpoint_id);
     }
 
     const all_keys = await this.connection.keys(
-      makeRedisCheckpointKey(thread_id, checkpoint_ns, "*")
+      makeRedisCheckpointKey(threadId, checkpoint_ns, "*")
     );
 
     if (all_keys.length === 0) {

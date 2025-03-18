@@ -21,8 +21,8 @@ interface DBQueryInput {
 // Define your tool function using AppConfig as the configuration
 const dbTool = tool(
   async (input: DBQueryInput, { configurable }: RunnableConfig) => {
+    const logger = configurable?.logger ?? pino(); // Ensure logger is defined
     try {
-      const logger = configurable?.logger || pino();
       const result = await queryDB(logger, input.query);
       return JSON.stringify(result, null, 2);
     } catch (error: any) {

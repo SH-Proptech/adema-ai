@@ -12,6 +12,12 @@ import { tools } from "./tools";
 import { redisCheckpointer } from "@lib/redis/redis";
 import { messageModifier, trimmer } from "@ai/trimmer";
 import pino from "pino";
+import { RunnableConfig } from "@langchain/core/dist/runnables";
+
+export type AppRunnableConfig = RunnableConfig<{
+  threadId: string;
+  logger: pino.Logger;
+}>;
 
 // Create the agent with memory management and trimming
 const agent = createReactAgent({
@@ -27,10 +33,14 @@ async function ask(
   input = "What can you do?"
 ) {
   logger.info("user: ", threadId, input);
+
+  const config: AppRunnableConfig = {
+    configurable: { threadId, logger },
+    recursionLimit: 15,
+  };
+
   try {
-    const previousMessages = await redisCheckpointer.getTuple({
-      configurable: { thread_id: threadId },
-    });
+    const previousMessages = await redisCheckpointer.getTuple(config);
 
     // Define the messages for the conversation
     const messages = previousMessages
@@ -45,7 +55,7 @@ async function ask(
       {
         messages: trimmedMessages,
       },
-      { configurable: { thread_id: threadId, logger }, recursionLimit: 10 }
+      config
     );
 
     // Extract text response

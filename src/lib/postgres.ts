@@ -19,11 +19,12 @@ const { Pool } = pg;
 
 const pool = new Pool(options);
 
-pool.connect((err, client, release) => {
+pool.connect((err, _client, release) => {
   if (err) {
     return console.error("Error acquiring client", err.stack);
   } else {
     console.log("Connected to PostgreSQL database");
+    release(); // Release the client back to the pool
   }
 });
 
