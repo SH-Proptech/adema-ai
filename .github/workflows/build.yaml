@@ -24,13 +24,15 @@ jobs:
       # Build and push Docker image
       - name: Build and push Docker image
         id: docker-build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           file: ./docker/Dockerfile
           tags: |
             propacr.azurecr.io/adema-ai:latest
             propacr.azurecr.io/adema-ai:${{ github.sha }}
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
       # Read staging deployment JSON
       - name: Staging deploy-stg.json
