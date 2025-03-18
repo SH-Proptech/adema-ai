@@ -9,15 +9,19 @@ function down {
     docker system prune -a -f --volumes
 }
 
-function api_test {
+function test {
     CLIENT_ID=FsEQJSN0UMYn8ZAysphuM4WYteKKogHg
     CLIENT_SECRET=$(op item get "api-test-client-dev" --field credential --reveal)
     URL=http://localhost:8181
     CLIENT_ID=${CLIENT_ID} CLIENT_SECRET=${CLIENT_SECRET} URL=${URL} jest
 }
 
-function api_test_stg {
-    URL=https://stg.ai.propmatch.co.uk npm test
+function test_stg {
+    URL=https://stg.ai.propmatch.co.uk jest
+}
+
+function test_prd {
+    URL=https://ai.propmatch.co.uk jest
 }
 
 # ---------- Do NOT edit below --------------
