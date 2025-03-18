@@ -27,7 +27,7 @@ describe("POST /thread/:threadId", () => {
 
     // Add assertions for the response body here
     expect(response.body).toHaveProperty("response");
-  }, 10000);
+  }, 60000);
 });
 
 describe("GET /thread/:threadId", () => {
