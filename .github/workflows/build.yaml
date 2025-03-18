@@ -74,6 +74,8 @@ jobs:
         run: ./taskfile api_test
         env:
           URL: https://stg.ai.propmatch.co.uk
+          CLIENT_ID: ${{ secrets.STG_TEST_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.STG_TEST_CLIENT_SECRET }}
 
       # Read production deployment JSON
       - name: Production deploy-prd.json
@@ -105,4 +107,6 @@ jobs:
         id: production-api-tests
         run: ./taskfile api_test
         env:
-          URL: https://ai.propmatch.co.uk/
+          URL: https://ai.propmatch.co.uk
+          CLIENT_ID: ${{ secrets.PRD_TEST_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.PRD_TEST_CLIENT_SECRET }}
