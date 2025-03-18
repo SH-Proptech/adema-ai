@@ -624,6 +624,16 @@ CREATE TABLE public.care_long_term(
     PRIMARY KEY (code, period, support_setting, age_group)
 );
 
+// NHS dementia trends
+CREATE TABLE public.dementia(
+    code varchar(10) NOT NULL, -- Geography or region code
+    type geography_types, -- Type of geography
+    date date NOT NULL, -- Date
+    measure varchar(50) NOT NULL, -- Measure
+    value float, -- Optional value (can be NULL)
+    PRIMARY KEY (date, code, measure)
+);
+
 Hint: Tameside's lad_code is E08000008
 
 Additionally you can execute other tools to look up property data. You will need to resolve property ids into lat, long to perform title searches. 
