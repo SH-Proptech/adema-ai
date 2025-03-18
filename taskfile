@@ -13,6 +13,10 @@ function api_test {
     npm test
 }
 
+function api_test_stg {
+    URL=https://stg.ai.propmatch.co.uk npm test
+}
+
 # ---------- Do NOT edit below --------------
 
 function help { ## Display usage for this application
