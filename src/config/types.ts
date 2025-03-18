@@ -1,5 +1,9 @@
 export interface EnvVars {
   PORT: number;
+  AUTH0_AUDIENCE: string;
+  AUTH0_DOMAIN: string;
+  AUTH0_BASIC_CLIENT_ID: string;
+  AUTH0_BASIC_CLIENT_SECRET: string;
   AZURE_OPENAI_API_KEY: string;
   AZURE_OPENAI_ENDPOINT: string;
   AZURE_OPENAI_DEPLOYMENT_NAME: string;
