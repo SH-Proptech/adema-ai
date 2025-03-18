@@ -55,6 +55,12 @@ jobs:
           inputs: ${{ steps.read-stg-json.outputs.result }}
           ref: main
 
+      # Test staging
+      - name: Staging API tests
+        id: staging-api-tests
+        run: ./taskfile api_test
+        env:
+          URL: https://stg.ai.propmatch.co.uk/
 
       # Read production deployment JSON
       - name: Production deploy-prd.json
@@ -80,3 +86,10 @@ jobs:
           token: ${{ secrets.GH_PAT_TOKEN }}
           inputs: ${{ steps.read-prd-json.outputs.result }}
           ref: main
+
+      # Test production
+      - name: Production API tests
+        id: production-api-tests
+        run: ./taskfile api_test
+        env:
+          URL: https://ai.propmatch.co.uk/

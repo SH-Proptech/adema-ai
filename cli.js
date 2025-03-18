@@ -4,8 +4,8 @@ const axios = require("axios");
 const readline = require("readline");
 const chalk = require("chalk");
 
-const API_URL = "http://localhost:3000/chat";
 const threadId = "Brendon"; // Static thread ID for now
+const API_URL = "http://localhost:8181/thread/" + threadId;
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -20,7 +20,6 @@ console.log(
 async function sendMessage(message) {
   try {
     const response = await axios.post(API_URL, {
-      threadId,
       message,
     });
 

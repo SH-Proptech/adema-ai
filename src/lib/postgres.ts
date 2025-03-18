@@ -20,12 +20,12 @@ const { Pool } = pg;
 const pool = new Pool(options);
 
 pool.connect((err, _client, release) => {
+  release(); // Release the client back to the pool
   if (err) {
-    return console.error("Error acquiring client", err.stack);
-  } else {
-    console.log("Connected to PostgreSQL database");
-    release(); // Release the client back to the pool
+    console.error("Connected to Postgres error:", err.stack);
+    return;
   }
+  console.log("Connected to Postgres");
 });
 
 async function queryDB(
@@ -33,8 +33,8 @@ async function queryDB(
   query: string,
   params: any[] = []
 ): Promise<any[]> {
-  logger.info(`Querying database: ${query}`);
   try {
+    logger.info(`Querying database: ${query}`);
     const { rows } = await pool.query(query, params);
     return rows;
   } catch (error) {

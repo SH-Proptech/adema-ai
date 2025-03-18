@@ -29,7 +29,7 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY package.json ./
 
 # Expose the port (defined in your .env)
-EXPOSE 3000
+EXPOSE 8080
 
 # Start the app
 CMD ["npm", "start"]

@@ -20,11 +20,15 @@
     "paths": {
       "@ai/*": ["./src/ai/*"],
       "@config/*": ["./src/config/*"],
+      "@handler/*": ["./src/handler/*"],
       "@lib/*": ["./src/lib/*"],
       "@middleware/*": ["./src/middleware/*"],
       "@util/*": ["./src/util/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts" // Include test files
+  ],
   "exclude": ["node_modules"]
 }

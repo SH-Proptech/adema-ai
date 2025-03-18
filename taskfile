@@ -9,6 +9,9 @@ function down {
     docker system prune -a -f --volumes
 }
 
+function api_test {
+    npm test
+}
 
 # ---------- Do NOT edit below --------------
 
