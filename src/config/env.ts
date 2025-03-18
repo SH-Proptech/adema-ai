@@ -9,6 +9,10 @@ dotenv.config();
 // Define the schema for your environment variables using Zod
 const envSchema = z.object({
   PORT: z.string().default("8080").transform(Number), // default to 3000
+  AUTH0_AUDIENCE: z.string(),
+  AUTH0_DOMAIN: z.string(),
+  AUTH0_BASIC_CLIENT_ID: z.string(),
+  AUTH0_BASIC_CLIENT_SECRET: z.string(),
   AZURE_OPENAI_API_KEY: z.string(),
   AZURE_OPENAI_ENDPOINT: z.string().url(),
   AZURE_OPENAI_DEPLOYMENT_NAME: z.string(),
