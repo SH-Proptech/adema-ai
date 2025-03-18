@@ -1,36 +1,17 @@
-import express, { Request, Response } from "express";
-import dotenv from "dotenv";
-import { ask } from "./langchain";
+import express from "express";
 import { loggingMiddleware } from "@middleware/logging";
-
-dotenv.config();
+import { corsMiddleware } from "@middleware/cors";
+import { ping } from "@handler/ping";
+import { addMessageToThread, getThreadHistory } from "@handler/thread";
 
 const app = express();
-app.use(express.json()); // For parsing JSON request body
-app.use(loggingMiddleware()); // logging middleware
+app.use(express.json());
+app.use(loggingMiddleware());
+app.use(corsMiddleware());
 
-app.get("/ping", (req: Request, res: Response): void => {
-  req.log.debug("/ping");
-  res.send("Pong!");
-});
-
-app.post("/chat", async (req: Request, res: Response): Promise<void> => {
-  req.log.debug("/chat");
-  const { threadId, message } = req.body;
-
-  if (!threadId || !message) {
-    res.status(400).json({ error: "Thread ID and message are required" });
-    return;
-  }
-
-  try {
-    const response = await ask(req.log, threadId, message);
-    res.json({ response });
-  } catch (error) {
-    console.error("Error during conversation:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+app.get("/ping", ping);
+app.get("/thread/:threadId", getThreadHistory);
+app.post("/thread/:threadId", addMessageToThread);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose the port your app will run on (adjust the port if needed)
-EXPOSE 3000
+EXPOSE 8080
 
 # Run the development server with hot reload (npm run dev starts everything)
 CMD ["npm", "run", "dev"]

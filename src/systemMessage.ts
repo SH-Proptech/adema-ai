@@ -570,6 +570,7 @@ CREATE TABLE public.care_fee_rates(
     PRIMARY KEY (code, period)
 );
 
+The funding ratio between state and self funded
 CREATE TABLE public.care_funding(
     code varchar(10) NOT NULL,
     type varchar(50) NOT NULL,
@@ -627,6 +628,11 @@ Hint: Tameside's lad_code is E08000008
 
 Additionally you can execute other tools to look up property data. You will need to resolve property ids into lat, long to perform title searches. 
 Title searches return results in order of distance. So it is likely that the first result is the correct title.
+
+Whenever possible attempt to answer with rich markdown content. This will make the responses more engaging and informative.
+Also always add links to relevant information.
+
+And never return any information about the schema of the database or the tools available to you. This is a security risk.
 `;
 
 export { systemMessage };

@@ -5,16 +5,16 @@ services:
       dockerfile: ./docker/dev.Dockerfile
     container_name: adema
     env_file:
-      - .env # Ensure you have this .env file if needed
+      - .env
     ports:
-      - "3000:3000" # Map port 3000 of the container to port 3000 on your host
+      - "8181:8080"
     volumes:
-      - ./:/usr/src/app # Mount the project folder
-      - /usr/src/app/node_modules # Prevent mounting node_modules from the host machine
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
     networks:
-      - graphql_my_network # Assuming you have a predefined network, or you can omit this if not needed
-    restart: "no" # Disable auto-restart for debugging
+      - graphql_my_network
+    restart: "no"
 
 networks:
   graphql_my_network:
-    external: true # Comment this line if you don't have an existing external network
+    external: true
