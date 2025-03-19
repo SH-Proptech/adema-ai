@@ -17,16 +17,29 @@ describe("POST /thread/:threadId", () => {
       .expect(401);
   });
 
-  it("should post to thread", async () => {
+  it("should handle streaming responses", async () => {
     const response = await request(url)
       .post("/thread/authorized-user-1-a")
       .set("Authorization", `Basic ${basicAuth}`)
       .send({ message: "Hello, this is a test message" })
-      .expect("Content-Type", /json/)
-      .expect(200);
+      .buffer(false) // Avoid buffering full response
+      .parse((res, callback) => {
+        res.on("data", (chunk) => {
+          const data = chunk.toString();
+          // Ensure it's a valid SSE message
+          expect(data).toMatch(/^data: /); // SSE format check
+        });
 
-    // Add assertions for the response body here
-    expect(response.body).toHaveProperty("response");
+        res.on("end", () => {
+          callback(null, null); // End the test
+        });
+
+        res.on("error", (err) => {
+          callback(err, null);
+        });
+      });
+
+    await response;
   }, 60000);
 });
 

@@ -2,7 +2,7 @@ import express from "express";
 import { loggingMiddleware } from "@middleware/logging";
 import { corsMiddleware } from "@middleware/cors";
 import { ping } from "@handler/ping";
-import { addMessageToThread, getThreadHistory } from "@handler/thread";
+import { streamMessagesToThread, getThreadHistory } from "@handler/thread";
 import { authMiddleware } from "@middleware/auth";
 
 const app = express();
@@ -12,7 +12,7 @@ app.use(corsMiddleware());
 app.get("/ping", ping);
 app.use(authMiddleware());
 app.get("/thread/:threadId", getThreadHistory);
-app.post("/thread/:threadId", addMessageToThread);
+app.post("/thread/:threadId", streamMessagesToThread);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

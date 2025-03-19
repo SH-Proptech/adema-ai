@@ -8,7 +8,7 @@ const model = new AzureChatOpenAI({
   azureOpenAIApiDeploymentName: config.AZURE_OPENAI_DEPLOYMENT_NAME,
   azureOpenAIApiVersion: config.AZURE_OPENAI_API_VERSION,
   azureOpenAIBasePath: `${config.AZURE_OPENAI_ENDPOINT}/openai/deployments/`,
-  streaming: false,
+  streaming: true,
 });
 
 export { model };
