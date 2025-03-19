@@ -1,9 +1,13 @@
 import { redisCheckpointer } from "@lib/redis/redis";
 import { Request, Response } from "express";
-import { ask } from "../langchain";
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
+import { askStream } from "../langchain";
+import {
+  isAIMessage,
+  isAIMessageChunk,
+  isHumanMessage,
+} from "@langchain/core/messages";
 
-const addMessageToThread = async (
+const streamMessagesToThread = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -18,8 +22,7 @@ const addMessageToThread = async (
   }
 
   try {
-    const response = await ask(req.log, threadId, message);
-    res.json({ response });
+    await askStream(req.log, threadId, message, res);
   } catch (error) {
     console.error("Error during conversation:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -47,16 +50,18 @@ const getThreadHistory = async (req: Request, res: Response): Promise<any> => {
       return res.status(404).json({ message: "History not found" });
     }
 
+    console.log(messages);
+
     // Filter and map messages using instanceof
     const filteredMessages = messages
       .filter(
         (msg: any) =>
-          (msg instanceof HumanMessage || msg instanceof AIMessage) &&
+          (isHumanMessage(msg) || isAIMessage(msg) || isAIMessageChunk(msg)) &&
           msg.content !== ""
       )
       .map((msg: any) => ({
         content: msg.content,
-        isUser: msg instanceof HumanMessage,
+        isUser: isHumanMessage(msg),
         id: msg.id,
       }));
 
@@ -68,4 +73,4 @@ const getThreadHistory = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-export { addMessageToThread, getThreadHistory };
+export { getThreadHistory, streamMessagesToThread };

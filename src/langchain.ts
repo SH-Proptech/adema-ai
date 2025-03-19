@@ -1,9 +1,14 @@
 import {
   AIMessage,
+  AIMessageChunk,
+  BaseMessageChunk,
   HumanMessage,
-  MessageContent,
+  isAIMessageChunk,
+  isToolMessage,
+  isToolMessageChunk,
   SystemMessage,
   ToolMessage,
+  ToolMessageChunk,
 } from "@langchain/core/messages";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { systemMessage } from "./systemMessage";
@@ -13,6 +18,7 @@ import { redisCheckpointer } from "@lib/redis/redis";
 import { messageModifier, trimmer } from "@ai/trimmer";
 import pino from "pino";
 import { RunnableConfig } from "@langchain/core/dist/runnables";
+import { Response } from "express";
 
 export type AppRunnableConfig = RunnableConfig<{
   threadId: string;
@@ -27,53 +33,66 @@ const agent = createReactAgent({
   checkpointSaver: redisCheckpointer,
 });
 
-async function ask(
+async function askStream(
   logger: pino.Logger,
   threadId: string,
-  input = "What can you do?"
+  input: string,
+  res: Response
 ) {
-  logger.info("user: ", threadId, input);
+  logger.info("user:", threadId, input);
 
-  const config: AppRunnableConfig = {
-    configurable: { threadId, logger },
-    recursionLimit: 15,
-  };
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
 
   try {
-    const previousMessages = await redisCheckpointer.getTuple(config);
+    const previousMessages = await redisCheckpointer.getTuple({
+      configurable: { threadId, logger },
+      recursionLimit: 15,
+    });
 
-    // Define the messages for the conversation
     const messages = previousMessages
-      ? [
-          new HumanMessage(input), // User input
-        ]
+      ? [new HumanMessage(input)]
       : [new SystemMessage(systemMessage), new HumanMessage(input)];
 
-    // Trim the messages to fit within the token limit
     const trimmedMessages = await trimmer(messages);
-    const result = await agent.invoke(
-      {
-        messages: trimmedMessages,
-      },
-      config
+
+    // Stream the response from the model
+    const stream = await agent.stream(
+      { messages: trimmedMessages },
+      { configurable: { threadId, logger }, streamMode: "updates" }
     );
 
-    // Extract text response
-    const textResponse = result.messages.findLast(
-      (msg) => msg instanceof AIMessage
-    )?.content;
+    // Stream updates step-by-step
+    for await (const step of stream) {
+      if (step.agent?.messages) {
+        step.agent.messages.forEach((chunk: BaseMessageChunk) => {
+          if (isAIMessageChunk(chunk) && chunk.content) {
+            res.write(`data: ${JSON.stringify({ text: chunk.content })}\n\n`);
+          }
+        });
+      }
 
-    // Extract tool outputs
-    const toolOutputs = result.messages
-      .filter((msg) => msg instanceof ToolMessage)
-      .map((msg) => msg.content);
+      if (step.tools?.messages) {
+        // may need to check for isToolMessage
+        const toolMessage = step.tools.messages.find(isToolMessage);
+        if (toolMessage?.content) {
+          res.write(
+            `data: ${JSON.stringify({ tool: toolMessage.content })}\n\n`
+          );
+        }
+      }
+    }
 
-    const response = { text: textResponse, tools: toolOutputs };
-    logger.info("adema:", threadId, response);
-    return response;
+    res.write("data: [DONE]\n\n"); // Signal completion
+    res.end();
   } catch (error: any) {
-    console.error("Error:", error.message);
+    console.error("Streaming Error:", error.message);
+    res.write(
+      `data: ${JSON.stringify({ error: "Error processing request" })}\n\n`
+    );
+    res.end();
   }
 }
 
-export { ask };
+export { askStream };
