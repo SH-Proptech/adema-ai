@@ -50,8 +50,6 @@ const getThreadHistory = async (req: Request, res: Response): Promise<any> => {
       return res.status(404).json({ message: "History not found" });
     }
 
-    console.log(messages);
-
     // Filter and map messages using instanceof
     const filteredMessages = messages
       .filter(
