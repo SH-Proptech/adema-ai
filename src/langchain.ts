@@ -1,18 +1,13 @@
 import {
-  AIMessage,
   AIMessageChunk,
   BaseMessageChunk,
   HumanMessage,
   isAIMessageChunk,
-  isToolMessage,
-  isToolMessageChunk,
   SystemMessage,
-  ToolMessage,
-  ToolMessageChunk,
 } from "@langchain/core/messages";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { systemMessage } from "./systemMessage";
-import { model } from "@ai/llm";
+import { model, StructuredResponse } from "@ai/llm";
 import { tools } from "./tools";
 import { redisCheckpointer } from "@lib/redis/redis";
 import { messageModifier, trimmer } from "@ai/trimmer";
@@ -68,23 +63,15 @@ async function askStream(
       if (step.agent?.messages) {
         step.agent.messages.forEach((chunk: BaseMessageChunk) => {
           if (isAIMessageChunk(chunk) && chunk.content) {
-            res.write(`data: ${JSON.stringify({ text: chunk.content })}\n\n`);
+            const parsed = parse(chunk);
+            res.write(`data: ${JSON.stringify(parsed)}\n\n`);
           }
         });
       }
-
-      if (step.tools?.messages) {
-        // may need to check for isToolMessage
-        const toolMessage = step.tools.messages.find(isToolMessage);
-        if (toolMessage?.content) {
-          res.write(
-            `data: ${JSON.stringify({ tool: toolMessage.content })}\n\n`
-          );
-        }
-      }
     }
 
-    res.write("data: [DONE]\n\n"); // Signal completion
+    // Signal completion only if there were valid messages
+    res.write("data: [DONE]\n\n");
     res.end();
   } catch (error: any) {
     console.error("Streaming Error:", error.message);
@@ -93,6 +80,28 @@ async function askStream(
     );
     res.end();
   }
+}
+
+type Answer = {
+  content: StructuredResponse;
+  id: string;
+  isUser: boolean;
+};
+
+function parse(chunk: AIMessageChunk): Answer | null {
+  // If content is an array, convert to string and then trim
+  const content = Array.isArray(chunk.content)
+    ? chunk.content.join(" ")
+    : chunk.content;
+
+  const id = chunk.id || "unknown";
+
+  if (typeof content === "string" && content.trim()) {
+    const parsed = JSON.parse(content);
+    return { content: parsed, id, isUser: false };
+  }
+
+  return null;
 }
 
 export { askStream };

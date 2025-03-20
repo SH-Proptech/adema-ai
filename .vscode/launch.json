@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug TSX Script",
+      "runtimeExecutable": "npx",
+      "args": ["tsx", "basic.ts"],
+      "env": {
+        "NODE_OPTIONS": "--no-deprecation"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}
