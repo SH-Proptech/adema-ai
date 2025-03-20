@@ -2,6 +2,7 @@
   "name": "adema",
   "version": "1.0.0",
   "scripts": {
+    "basic": "NODE_OPTIONS='--no-deprecation' npx tsx basic.ts",
     "dev": "nodemon --exec 'node -r @swc-node/register src/main.ts' --watch src --ext ts,js,json",
     "watch-compile": "swc src -w --out-dir dist --strip-leading-paths",
     "watch-dev": "nodemon --watch \"dist/**/*\" -e js ./dist/main.js",
