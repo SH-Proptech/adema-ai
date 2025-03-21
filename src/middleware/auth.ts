@@ -17,6 +17,11 @@ const checkJwt = expressjwt({
   algorithms: ["RS256"],
 });
 
+console.log({
+  audience: config.AUTH0_AUDIENCE,
+  issuer: `https://${config.AUTH0_DOMAIN}/`,
+});
+
 // Basic Authentication Middleware
 const checkBasicAuth = (req: Request, res: Response, next: NextFunction) => {
   const credentials = basicAuth(req);

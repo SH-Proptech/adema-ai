@@ -4,6 +4,7 @@ import { corsMiddleware } from "@middleware/cors";
 import { ping } from "@handler/ping";
 import { streamMessagesToThread, getThreadHistory } from "@handler/thread";
 import { authMiddleware } from "@middleware/auth";
+import { createIndexHandler, uploadDocumentHandler } from "@handler/embeddings";
 
 const app = express();
 app.use(express.json());
@@ -13,6 +14,8 @@ app.get("/ping", ping);
 app.use(authMiddleware());
 app.get("/thread/:threadId", getThreadHistory);
 app.post("/thread/:threadId", streamMessagesToThread);
+app.post("/embeddings", uploadDocumentHandler);
+app.post("/index", createIndexHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

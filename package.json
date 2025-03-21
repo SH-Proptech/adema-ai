@@ -16,11 +16,13 @@
   "description": "",
   "dependencies": {
     "@azure/identity": "^4.7.0",
+    "@azure/search-documents": "^12.1.0",
     "@langchain/azure-openai": "^0.0.11",
-    "@langchain/community": "^0.3.34",
+    "@langchain/community": "^0.3.36",
     "@langchain/core": "^0.3.42",
     "@langchain/langgraph": "^0.2.55",
     "@langchain/openai": "^0.4.4",
+    "@langchain/redis": "^0.1.1",
     "basic-auth": "^2.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -35,6 +37,7 @@
     "pino-http": "^10.4.0",
     "pino-pretty": "^13.0.0",
     "readline-sync": "^1.4.10",
+    "redis": "^4.7.0",
     "terraformer-wkt-parser": "^1.2.1",
     "zod": "^3.24.2"
   },

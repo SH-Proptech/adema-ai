@@ -1,4 +1,3 @@
-import { redisCheckpointer } from "@lib/redis/redis";
 import { Request, Response } from "express";
 import { askStream } from "../langchain";
 import {
@@ -6,6 +5,7 @@ import {
   isAIMessageChunk,
   isHumanMessage,
 } from "@langchain/core/messages";
+import { redisCheckpointer } from "@lib/redis/redisCheckpointer";
 
 const streamMessagesToThread = async (
   req: Request,
