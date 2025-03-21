@@ -13,6 +13,8 @@ const envSchema = z.object({
   AUTH0_DOMAIN: z.string(),
   AUTH0_BASIC_CLIENT_ID: z.string(),
   AUTH0_BASIC_CLIENT_SECRET: z.string(),
+  AZURE_AISEARCH_ENDPOINT: z.string(),
+  AZURE_AISEARCH_KEY: z.string(),
   AZURE_OPENAI_API_KEY: z.string(),
   AZURE_OPENAI_ENDPOINT: z.string().url(),
   AZURE_OPENAI_DEPLOYMENT_NAME: z.string(),

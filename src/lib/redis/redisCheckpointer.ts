@@ -1,5 +1,5 @@
-import type { RunnableConfig } from "@langchain/core/runnables";
-import type { Redis } from "ioredis";
+import { Redis } from "ioredis";
+import { config } from "@config/env";
 import {
   BaseCheckpointSaver,
   type Checkpoint,
@@ -19,13 +19,27 @@ import {
   loadWrites,
   parseRedisCheckpointData,
   parseRedisCheckpointKey,
-} from "./redisUtils";
+} from "./redisCheckpointerUtils";
+
+import type { RunnableConfig } from "@langchain/core/runnables";
+
+// Create the Redis connection instance using ioredis
+const redisConnection = new Redis({
+  host: config.REDIS_HOST, // Use the host from environment variables
+  password: config.REDIS_PASSWORD, // Use the password from environment variables
+  port: config.REDIS_PORT,
+  db: config.REDIS_DB,
+});
+
+redisConnection.on("connect", () => {
+  console.log("Connected to Redis");
+});
 
 export type RedisSaverParams = {
   connection: Redis;
 };
 
-export class RedisCheckpointSaver extends BaseCheckpointSaver {
+class RedisCheckpointSaver extends BaseCheckpointSaver {
   connection: Redis;
   ttl: number | undefined;
 
@@ -236,3 +250,10 @@ export class RedisCheckpointSaver extends BaseCheckpointSaver {
     return latest_key;
   }
 }
+
+// Instantiate the RedisCheckpointSaver with the Redis connection, serializer, and TTL
+const redisCheckpointer = new RedisCheckpointSaver(
+  { connection: redisConnection } // Connection parameter
+);
+
+export { redisCheckpointer };

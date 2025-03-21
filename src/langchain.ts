@@ -9,11 +9,11 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { systemMessage } from "./systemMessage";
 import { model, StructuredResponse } from "@ai/llm";
 import { tools } from "./tools";
-import { redisCheckpointer } from "@lib/redis/redis";
 import { messageModifier, trimmer } from "@ai/trimmer";
 import pino from "pino";
 import { RunnableConfig } from "@langchain/core/dist/runnables";
 import { Response } from "express";
+import { redisCheckpointer } from "@lib/redis/redisCheckpointer";
 
 export type AppRunnableConfig = RunnableConfig<{
   threadId: string;
